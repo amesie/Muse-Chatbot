@@ -69,6 +69,16 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
   margin-bottom: 20px;
 }
 .setup-input:focus { border-color: var(--cyan); }
+.remember-row {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 20px; justify-content: flex-start;
+}
+.remember-row input[type="checkbox"] {
+  width: 16px; height: 16px; cursor: pointer;
+}
+.remember-row label {
+  font-size: 13px; color: var(--text-mid); cursor: pointer;
+}
 .setup-btn {
   width: 100%; padding: 16px;
   background: var(--charcoal);
@@ -441,8 +451,6 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes bounce { 0%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-6px); } }
-
-/* ── Logo SVG ─────────────────────────────────────────────── */
 </style>
 </head>
 <body>
@@ -463,6 +471,11 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
     <p class="setup-sub">Your personal creative assistant — ready to generate on-brand Facebook posts, course outlines, and newsletter copy whenever you need it.</p>
     <div class="setup-label">Your Gemini API Key</div>
     <input class="setup-input" type="password" id="api-key-input" placeholder="AIzaSy..." autocomplete="off">
+    <!-- 👇 Remember me checkbox -->
+    <div class="remember-row">
+      <input type="checkbox" id="remember-key-checkbox">
+      <label for="remember-key-checkbox">Remember my API key on this browser</label>
+    </div>
     <button class="setup-btn" onclick="startApp()">Open MUSE →</button>
     <p class="setup-note">Your key is stored only in this browser session and never sent anywhere except directly to Google Gemini to power MUSE. Get a free key at aistudio.google.com — no credit card required.</p>
   </div>
@@ -577,7 +590,7 @@ const PILLAR_COLOURS = {
   'Community':           '#F5C518',
 };
 
-// ── System Prompt ─────────────────────────────────────────────────────────────
+// ── Updated System Prompt with clear rules for when to use cards ──
 const SYSTEM_PROMPT = `You are MUSE, the creative AI assistant for Mastering It — a South African tutoring and education business owned by Maryke Jooste. You are a Level 3 AI Agent with a Reflection Pattern: you internally draft content, critique it against the Mastering It brand voice, then deliver only refined, on-brand output.
 
 BUSINESS: Mastering It | Owner: Maryke Jooste | WhatsApp: 072 372 4353 | Email: maryke@masteringit.co.za | Website: www.masteringit.co.za | Primary platform: Facebook
@@ -625,7 +638,8 @@ RESPONSE FORMAT RULES:
 
 Remember: cards are ONLY for social posts. All other content is plain text.`;
 
-const REFLECTION_PROMPT = 'You are an internal brand quality reviewer for Mastering It. Review the DRAFT content you just created and check it against these brand rules:
+// ── Updated Reflection Prompt (no confusion about user-provided drafts) ──
+const REFLECTION_PROMPT = `You are an internal brand quality reviewer for Mastering It. Review the DRAFT content you just created and check it against these brand rules:
 1. Tone: warm, approachable, relational — NOT corporate or pushy
 2. Max ONE exclamation mark per post caption
 3. Value-first: does the post teach, connect, or invite conversation?
@@ -638,16 +652,38 @@ If anything violates the rules, fix it and return the corrected full response. I
 
 // ── App Start ─────────────────────────────────────────────────────────────────
 function startApp() {
-  const key = document.getElementById('api-key-input').value.trim();
+  const keyInput = document.getElementById('api-key-input');
+  const key = keyInput.value.trim();
+  const remember = document.getElementById('remember-key-checkbox').checked;
+
   if (!key || !key.startsWith('AIza')) {
     alert('Please enter a valid Gemini API key (starts with AIza). Get one free at aistudio.google.com');
     return;
   }
+
   API_KEY = key;
+
+  // Save to localStorage if "remember" is checked
+  if (remember) {
+    localStorage.setItem('muse_api_key', key);
+  } else {
+    // If they don't want to remember, remove any previously saved key
+    localStorage.removeItem('muse_api_key');
+  }
+
   document.getElementById('setup-screen').style.display = 'none';
   const app = document.getElementById('app');
   app.classList.add('visible');
 }
+
+// On page load, pre-fill API key if saved
+window.addEventListener('load', function() {
+  const savedKey = localStorage.getItem('muse_api_key');
+  if (savedKey) {
+    document.getElementById('api-key-input').value = savedKey;
+    document.getElementById('remember-key-checkbox').checked = true;
+  }
+});
 
 function newSession() {
   messages = [];
