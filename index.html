@@ -625,7 +625,7 @@ RESPONSE FORMAT RULES:
 
 Remember: cards are ONLY for social posts. All other content is plain text.`;
 
-const REFLECTION_PROMPT = `You are a brand quality reviewer for Mastering It. Review the following content draft and check it against these brand rules:
+const REFLECTION_PROMPT = 'You are an internal brand quality reviewer for Mastering It. Review the DRAFT content you just created and check it against these brand rules:
 1. Tone: warm, approachable, relational — NOT corporate or pushy
 2. Max ONE exclamation mark per post caption
 3. Value-first: does the post teach, connect, or invite conversation?
@@ -634,7 +634,7 @@ const REFLECTION_PROMPT = `You are a brand quality reviewer for Mastering It. Re
 6. JSON card format is correct with all required fields
 7. Layouts and palettes are varied within the batch
 
-If anything violates the rules, fix it and return the corrected full response. If everything is good, return it as-is. Return the complete response including any <CARDS> tags.`;
+If anything violates the rules, fix it and return the corrected full response. If everything is good, return it as-is. DO NOT mention that you're reviewing a draft or that the user provided anything — this is your internal self-review. Just return the final refined response including any <CARDS> tags.`;
 
 // ── App Start ─────────────────────────────────────────────────────────────────
 function startApp() {
