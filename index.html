@@ -1,1078 +1,678 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MUSE — Mastering It Creative Assistant</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<style>
-/* ── Reset & Variables ─────────────────────────────────────── */
-:root {
-  --cream:    #FDF8F3;
-  --warm:     #F7F0E8;
-  --charcoal: #2C2C2C;
-  --cyan:     #00BCC8;
-  --cyan-lt:  #E0F8FA;
-  --yellow:   #F5C518;
-  --yel-lt:   #FEF9E3;
-  --pink:     #E8175D;
-  --pink-lt:  #FDE8EF;
-  --sage:     #6B9E78;
-  --sage-lt:  #EBF5EE;
-  --lavender: #8B7EC8;
-  --lav-lt:   #EEEAF8;
-  --peach:    #E8834A;
-  --peach-lt: #FDF0E8;
-  --text:     #1E1E1E;
-  --text-mid: #5A5A6A;
-  --text-lt:  #9898A8;
-  --border:   #E8E0D8;
-  --shadow:   rgba(44,44,44,0.08);
-  --radius:   16px;
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUSE — Mastering It Creative Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #FDF8F3;
+            color: #1E1E1E;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        /* Setup screen */
+        #setup-screen {
+            position: fixed;
+            inset: 0;
+            background: #FDF8F3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 100;
+        }
+        .setup-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(44,44,44,0.08);
+            text-align: center;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: #00BCC8;
+            border-radius: 8px;
+        }
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2C2C2C;
+        }
+        .logo-text span { font-weight: 300; }
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            margin-bottom: 12px;
+            color: #2C2C2C;
+        }
+        .sub {
+            color: #5A5A6A;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+        .label {
+            text-align: left;
+            font-size: 12px;
+            font-weight: 500;
+            color: #5A5A6A;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1.5px solid #E8E0D8;
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            background: #FDF8F3;
+            margin-bottom: 16px;
+            outline: none;
+        }
+        input:focus { border-color: #00BCC8; }
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            justify-content: flex-start;
+        }
+        .checkbox-row input {
+            width: 16px;
+            height: 16px;
+            margin: 0;
+        }
+        .checkbox-row label {
+            font-size: 13px;
+            color: #5A5A6A;
+        }
+        button {
+            width: 100%;
+            padding: 16px;
+            background: #2C2C2C;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover { background: #00BCC8; }
+        .note {
+            font-size: 11px;
+            color: #9898A8;
+            margin-top: 16px;
+            line-height: 1.5;
+        }
 
-/* ── Setup Screen ─────────────────────────────────────────── */
-#setup-screen {
-  position: fixed; inset: 0; z-index: 100;
-  background: var(--cream);
-  display: flex; align-items: center; justify-content: center;
-  padding: 24px;
-  animation: fadeIn 0.4s ease;
-}
-.setup-card {
-  background: white;
-  border-radius: 24px;
-  padding: 48px 40px;
-  max-width: 480px; width: 100%;
-  box-shadow: 0 20px 60px var(--shadow);
-  text-align: center;
-}
-.setup-logo { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 28px; }
-.setup-logo-icon { width: 36px; height: 36px; }
-.setup-logo-text { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 700; color: var(--charcoal); }
-.setup-logo-text span { font-weight: 300; }
-.setup-title { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--charcoal); margin-bottom: 8px; }
-.setup-sub { font-size: 14px; color: var(--text-mid); line-height: 1.6; margin-bottom: 32px; }
-.setup-label { font-size: 12px; font-weight: 500; color: var(--text-mid); text-align: left; margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
-.setup-input {
-  width: 100%; padding: 14px 16px;
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px; color: var(--text);
-  background: var(--cream);
-  outline: none;
-  transition: border-color 0.2s;
-  margin-bottom: 20px;
-}
-.setup-input:focus { border-color: var(--cyan); }
-.remember-row {
-  display: flex; align-items: center; gap: 8px;
-  margin-bottom: 20px; justify-content: flex-start;
-}
-.remember-row input[type="checkbox"] {
-  width: 16px; height: 16px; cursor: pointer;
-}
-.remember-row label {
-  font-size: 13px; color: var(--text-mid); cursor: pointer;
-}
-.setup-btn {
-  width: 100%; padding: 16px;
-  background: var(--charcoal);
-  color: white;
-  border: none; border-radius: 12px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 15px; font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.setup-btn:hover { background: var(--cyan); transform: translateY(-1px); }
-.setup-note { font-size: 11px; color: var(--text-lt); margin-top: 14px; line-height: 1.5; }
+        /* Main app */
+        #app {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+        }
+        #app.visible { display: flex; }
 
-/* ── App Layout ───────────────────────────────────────────── */
-#app { display: none; height: 100vh; flex-direction: column; }
-#app.visible { display: flex; animation: fadeIn 0.4s ease; }
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid #E8E0D8;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-logo {
+            width: 32px;
+            height: 32px;
+            background: #00BCC8;
+            border-radius: 6px;
+        }
+        .header-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            color: #2C2C2C;
+        }
+        .header-tag {
+            background: #E0F8FA;
+            color: #00BCC8;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+        .new-session {
+            background: #2C2C2C;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .new-session:hover { background: #00BCC8; }
 
-/* ── Header ───────────────────────────────────────────────── */
-.header {
-  background: white;
-  border-bottom: 1px solid var(--border);
-  padding: 0 24px;
-  height: 64px;
-  display: flex; align-items: center; justify-content: space-between;
-  flex-shrink: 0;
-}
-.header-left { display: flex; align-items: center; gap: 12px; }
-.header-logo { width: 32px; height: 32px; }
-.header-name { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--charcoal); }
-.header-tag {
-  background: var(--cyan-lt); color: var(--cyan);
-  font-size: 10px; font-weight: 700;
-  letter-spacing: 1.5px; text-transform: uppercase;
-  padding: 4px 10px; border-radius: 20px;
-}
-.header-right { display: flex; align-items: center; gap: 8px; }
-.header-pill {
-  background: var(--warm); color: var(--text-mid);
-  font-size: 11px; font-weight: 500;
-  padding: 6px 12px; border-radius: 20px;
-  border: 1px solid var(--border);
-}
-.new-session-btn {
-  background: var(--charcoal); color: white;
-  border: none; border-radius: 10px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 12px; font-weight: 600;
-  padding: 8px 16px; cursor: pointer;
-  transition: all 0.2s;
-}
-.new-session-btn:hover { background: var(--cyan); }
+        /* Chat area */
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            scroll-behavior: smooth;
+        }
 
-/* ── Chat Area ────────────────────────────────────────────── */
-.chat-area {
-  flex: 1; overflow-y: auto;
-  padding: 24px;
-  display: flex; flex-direction: column; gap: 20px;
-  scroll-behavior: smooth;
-}
-.chat-area::-webkit-scrollbar { width: 6px; }
-.chat-area::-webkit-scrollbar-track { background: transparent; }
-.chat-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        /* Welcome */
+        .welcome {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 20px;
+            gap: 16px;
+        }
+        .welcome-icon { font-size: 48px; }
+        .welcome-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            color: #2C2C2C;
+        }
+        .welcome-sub {
+            color: #5A5A6A;
+            font-size: 15px;
+            max-width: 440px;
+            line-height: 1.6;
+        }
+        .quick-prompts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            max-width: 540px;
+        }
+        .qp {
+            background: white;
+            border: 1.5px solid #E8E0D8;
+            border-radius: 20px;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #5A5A6A;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .qp:hover {
+            border-color: #00BCC8;
+            color: #00BCC8;
+            background: #E0F8FA;
+        }
 
-/* ── Welcome State ────────────────────────────────────────── */
-.welcome {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; flex: 1; text-align: center;
-  padding: 40px 20px; gap: 16px;
-}
-.welcome-icon { font-size: 48px; margin-bottom: 8px; }
-.welcome-title { font-family: 'Playfair Display', serif; font-size: 32px; color: var(--charcoal); }
-.welcome-sub { font-size: 15px; color: var(--text-mid); max-width: 400px; line-height: 1.65; }
-.quick-prompts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 8px; max-width: 520px; }
-.qp {
-  background: white; border: 1.5px solid var(--border);
-  color: var(--text-mid); font-size: 13px; font-weight: 500;
-  padding: 10px 16px; border-radius: 20px;
-  cursor: pointer; transition: all 0.2s;
-}
-.qp:hover { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-lt); transform: translateY(-1px); }
+        /* Messages */
+        .msg {
+            display: flex;
+            gap: 12px;
+        }
+        .msg.user { flex-direction: row-reverse; }
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .muse .avatar {
+            background: #2C2C2C;
+            color: white;
+            font-family: 'Playfair Display', serif;
+            font-size: 14px;
+        }
+        .user .avatar {
+            background: #00BCC8;
+            color: white;
+            font-size: 14px;
+        }
+        .msg-content {
+            max-width: 68%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .bubble {
+            padding: 14px 18px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.7;
+            background: white;
+            border: 1px solid #E8E0D8;
+            box-shadow: 0 2px 8px rgba(44,44,44,0.08);
+        }
+        .user .bubble {
+            background: #2C2C2C;
+            color: white;
+            border: none;
+        }
+        .thinking .bubble {
+            background: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .dots {
+            display: flex;
+            gap: 4px;
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #00BCC8;
+            animation: bounce 1.2s infinite;
+        }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce { 40% { transform: translateY(-6px); } }
 
-/* ── Messages ─────────────────────────────────────────────── */
-.msg { display: flex; gap: 12px; animation: slideUp 0.3s ease; }
-.msg.user { flex-direction: row-reverse; }
-.msg-avatar {
-  width: 36px; height: 36px; border-radius: 50%;
-  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-  font-size: 16px; font-weight: 700;
-}
-.msg.muse .msg-avatar { background: var(--charcoal); color: white; font-family: 'Playfair Display', serif; font-size: 14px; }
-.msg.user .msg-avatar { background: var(--cyan); color: white; font-size: 14px; }
-.msg-content { max-width: 68%; display: flex; flex-direction: column; gap: 8px; }
-.msg.user .msg-content { align-items: flex-end; }
-.msg-bubble {
-  padding: 14px 18px;
-  border-radius: var(--radius);
-  font-size: 14px; line-height: 1.7;
-}
-.msg.muse .msg-bubble {
-  background: white; color: var(--text);
-  border: 1px solid var(--border);
-  border-bottom-left-radius: 4px;
-  box-shadow: 0 2px 8px var(--shadow);
-}
-.msg.user .msg-bubble {
-  background: var(--charcoal); color: white;
-  border-bottom-right-radius: 4px;
-}
-
-/* ── Thinking Indicator ───────────────────────────────────── */
-.thinking {
-  display: flex; align-items: center; gap: 8px;
-  padding: 14px 18px;
-  background: white; border: 1px solid var(--border);
-  border-radius: var(--radius); border-bottom-left-radius: 4px;
-  box-shadow: 0 2px 8px var(--shadow);
-  width: fit-content;
-}
-.thinking-text { font-size: 13px; color: var(--text-mid); font-style: italic; }
-.dots { display: flex; gap: 4px; }
-.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); animation: bounce 1.2s infinite; }
-.dot:nth-child(2) { animation-delay: 0.2s; }
-.dot:nth-child(3) { animation-delay: 0.4s; }
-
-/* ── Post Cards Container ─────────────────────────────────── */
-.cards-container { display: flex; flex-direction: column; gap: 16px; }
-.cards-label {
-  font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
-  text-transform: uppercase; color: var(--text-lt);
-  padding: 0 4px;
-}
-
-/* ── Post Card Wrapper ────────────────────────────────────── */
-.post-card-wrap {
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 4px 16px var(--shadow);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.post-card-wrap:hover { transform: translateY(-2px); box-shadow: 0 8px 28px var(--shadow); }
-
-.post-card-meta {
-  padding: 12px 16px;
-  display: flex; align-items: center; gap: 8px;
-  border-bottom: 1px solid var(--border);
-  background: var(--cream);
-}
-.meta-pillar {
-  font-size: 10px; font-weight: 700; letter-spacing: 1px;
-  text-transform: uppercase; padding: 4px 10px; border-radius: 12px;
-}
-.meta-audience { font-size: 11px; color: var(--text-mid); }
-.meta-template { font-size: 10px; color: var(--text-lt); margin-left: auto; font-style: italic; }
-
-/* ── The actual visual card (1080×1080 scaled) ── */
-.visual-card {
-  width: 100%;
-  aspect-ratio: 1;
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
-}
-/* Each layout variant */
-
-/* Layout A — Bold Diagonal */
-.layout-a { background: var(--charcoal); }
-.layout-a .lc-diagonal {
-  position: absolute; top: -20%; right: -10%;
-  width: 65%; height: 140%;
-  border-radius: 12px;
-  transform: rotate(-8deg);
-}
-.layout-a .lc-logo { position: absolute; top: 6%; left: 5%; display: flex; align-items: center; gap: 6px; }
-.layout-a .lc-logo-text { font-family: 'DM Sans', sans-serif; font-size: 3.5%; font-weight: 700; color: white; }
-.layout-a .lc-badge {
-  position: absolute; top: 6%; right: 5%;
-  background: white; border-radius: 20px;
-  padding: 1.5% 3%; font-size: 2.5%; font-weight: 700;
-}
-.layout-a .lc-content { position: absolute; bottom: 12%; left: 5%; right: 40%; }
-.layout-a .lc-eyebrow { font-size: 2.2%; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 3%; opacity: 0.8; }
-.layout-a .lc-headline { font-family: 'Playfair Display', serif; font-size: 8%; line-height: 1.1; color: white; margin-bottom: 3%; font-weight: 900; }
-.layout-a .lc-sub { font-size: 2.8%; line-height: 1.5; color: rgba(255,255,255,0.75); margin-bottom: 4%; }
-.layout-a .lc-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 2% 5%; background: rgba(0,0,0,0.3); font-size: 2%; color: rgba(255,255,255,0.6); display: flex; gap: 2%; }
-
-/* Layout B — Split Block */
-.layout-b { background: white; display: flex; }
-.layout-b .lc-left { width: 42%; display: flex; flex-direction: column; justify-content: flex-end; padding: 8%; }
-.layout-b .lc-right { flex: 1; padding: 8% 6%; display: flex; flex-direction: column; justify-content: center; }
-.layout-b .lc-logo { display: flex; align-items: center; gap: 5px; margin-bottom: 8%; }
-.layout-b .lc-logo-text { font-size: 3.2%; font-weight: 700; color: white; }
-.layout-b .lc-headline { font-family: 'Playfair Display', serif; font-size: 7%; line-height: 1.15; color: white; font-weight: 900; margin-bottom: 4%; }
-.layout-b .lc-pillar-tag { font-size: 2%; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.7); }
-.layout-b .lc-eyebrow { font-size: 2.2%; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 3%; }
-.layout-b .lc-sub { font-size: 3%; line-height: 1.55; color: var(--text-mid); margin-bottom: 5%; }
-.layout-b .lc-cta { font-size: 2.5%; font-weight: 700; padding: 2.5% 5%; border-radius: 8px; color: white; width: fit-content; }
-.layout-b .lc-footer { position: absolute; bottom: 0; right: 0; padding: 2% 4%; font-size: 1.9%; color: var(--text-lt); }
-
-/* Layout C — Quote Card */
-.layout-c { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8%; }
-.layout-c .lc-qmark { font-family: 'Playfair Display', serif; font-size: 18%; line-height: 0.6; margin-bottom: 3%; opacity: 0.2; }
-.layout-c .lc-headline { font-family: 'Playfair Display', serif; font-size: 6.5%; line-height: 1.3; text-align: center; font-style: italic; margin-bottom: 5%; font-weight: 700; }
-.layout-c .lc-rule { width: 15%; height: 3px; border-radius: 2px; margin: 0 auto 4%; }
-.layout-c .lc-sub { font-size: 2.8%; text-align: center; line-height: 1.5; max-width: 80%; color: var(--text-mid); margin-bottom: 6%; }
-.layout-c .lc-logo { display: flex; align-items: center; gap: 6px; }
-.layout-c .lc-logo-text { font-size: 3%; font-weight: 700; color: var(--charcoal); }
-.layout-c .lc-badge { position: absolute; top: 6%; right: 5%; font-size: 2.2%; font-weight: 700; padding: 1.5% 3%; border-radius: 20px; color: white; }
-
-/* Layout D — Tip Card */
-.layout-d { padding: 0; }
-.layout-d .lc-top { padding: 6% 7% 4%; }
-.layout-d .lc-logo { display: flex; align-items: center; gap: 6px; margin-bottom: 4%; }
-.layout-d .lc-logo-text { font-size: 3.2%; font-weight: 700; }
-.layout-d .lc-number { font-family: 'Playfair Display', serif; font-size: 22%; line-height: 0.8; font-weight: 900; opacity: 0.08; position: absolute; top: 2%; right: 4%; }
-.layout-d .lc-eyebrow { font-size: 2.2%; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 3%; }
-.layout-d .lc-headline { font-family: 'Playfair Display', serif; font-size: 7.5%; line-height: 1.1; font-weight: 900; margin-bottom: 4%; }
-.layout-d .lc-divider { height: 3px; border-radius: 2px; margin: 0 7% 5%; }
-.layout-d .lc-content { padding: 0 7%; }
-.layout-d .lc-sub { font-size: 3%; line-height: 1.6; color: var(--text-mid); margin-bottom: 5%; }
-.layout-d .lc-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 2.5% 7%; font-size: 2%; color: white; display: flex; gap: 3%; }
-
-/* Layout E — Minimal Clean */
-.layout-e { background: var(--cream); }
-.layout-e .lc-accent-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 2%; }
-.layout-e .lc-logo { position: absolute; top: 6%; right: 5%; display: flex; align-items: center; gap: 6px; }
-.layout-e .lc-logo-text { font-size: 3%; font-weight: 700; color: var(--charcoal); }
-.layout-e .lc-content { position: absolute; top: 50%; left: 10%; right: 8%; transform: translateY(-50%); }
-.layout-e .lc-eyebrow { font-size: 2.2%; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 4%; }
-.layout-e .lc-headline { font-family: 'Playfair Display', serif; font-size: 9%; line-height: 1.05; font-weight: 900; color: var(--charcoal); margin-bottom: 5%; }
-.layout-e .lc-sub { font-size: 3%; line-height: 1.6; color: var(--text-mid); max-width: 85%; }
-.layout-e .lc-footer { position: absolute; bottom: 4%; left: 10%; right: 8%; font-size: 2%; color: var(--text-lt); display: flex; justify-content: space-between; align-items: center; }
-.layout-e .lc-badge { font-size: 2.2%; font-weight: 700; padding: 1.5% 3%; border-radius: 20px; color: white; }
-
-/* Layout F — Full Colour Bold */
-.layout-f { display: flex; flex-direction: column; justify-content: space-between; padding: 7%; }
-.layout-f .lc-top { display: flex; justify-content: space-between; align-items: flex-start; }
-.layout-f .lc-logo-text { font-size: 3.5%; font-weight: 700; color: rgba(255,255,255,0.9); }
-.layout-f .lc-badge { background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.3); font-size: 2.2%; font-weight: 700; padding: 1.5% 3%; border-radius: 20px; color: white; }
-.layout-f .lc-middle { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-.layout-f .lc-headline { font-family: 'Playfair Display', serif; font-size: 10%; line-height: 1.05; color: white; font-weight: 900; margin-bottom: 4%; }
-.layout-f .lc-sub { font-size: 3.2%; line-height: 1.55; color: rgba(255,255,255,0.8); max-width: 85%; }
-.layout-f .lc-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
-.layout-f .lc-contact { font-size: 2.2%; color: rgba(255,255,255,0.7); line-height: 1.6; }
-.layout-f .lc-dot { width: 8%; height: 8%; border-radius: 50%; background: rgba(255,255,255,0.15); }
-
-/* Layout G — Story Card */
-.layout-g { background: white; }
-.layout-g .lc-colour-band { position: absolute; top: 0; left: 0; right: 0; height: 45%; }
-.layout-g .lc-logo { position: absolute; top: 4%; left: 5%; display: flex; align-items: center; gap: 6px; }
-.layout-g .lc-logo-text { font-size: 3.2%; font-weight: 700; color: white; }
-.layout-g .lc-avatar { position: absolute; top: 28%; left: 5%; width: 20%; height: 20%; border-radius: 50%; border: 3px solid white; background: var(--warm); display: flex; align-items: center; justify-content: center; font-size: 8%; }
-.layout-g .lc-content { position: absolute; top: 48%; left: 5%; right: 5%; padding-top: 4%; }
-.layout-g .lc-name { font-family: 'Playfair Display', serif; font-size: 5%; font-weight: 700; color: var(--charcoal); margin-bottom: 1.5%; }
-.layout-g .lc-role { font-size: 2.2%; color: var(--text-lt); margin-bottom: 4%; letter-spacing: 0.5px; }
-.layout-g .lc-sub { font-size: 2.9%; line-height: 1.6; color: var(--text-mid); margin-bottom: 4%; font-style: italic; }
-.layout-g .lc-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 2% 5%; font-size: 2%; color: var(--text-lt); background: var(--warm); display: flex; gap: 3%; }
-
-/* Layout H — Three Points */
-.layout-h { padding: 6% 7%; }
-.layout-h .lc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6%; }
-.layout-h .lc-logo-text { font-size: 3.2%; font-weight: 700; }
-.layout-h .lc-badge { font-size: 2.2%; font-weight: 700; padding: 1.5% 3%; border-radius: 20px; color: white; }
-.layout-h .lc-headline { font-family: 'Playfair Display', serif; font-size: 7%; line-height: 1.1; font-weight: 900; margin-bottom: 5%; }
-.layout-h .lc-points { display: flex; flex-direction: column; gap: 3%; }
-.layout-h .lc-point { display: flex; gap: 4%; align-items: flex-start; }
-.layout-h .lc-point-num { width: 8%; height: 8%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3%; font-weight: 700; color: white; flex-shrink: 0; }
-.layout-h .lc-point-text { font-size: 2.8%; line-height: 1.5; color: var(--text-mid); }
-.layout-h .lc-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 2.5% 7%; font-size: 2%; color: white; }
-
-/* ── Card Action Bar ──────────────────────────────────────── */
-.card-actions {
-  padding: 12px 16px;
-  display: flex; gap: 8px; align-items: center;
-  border-top: 1px solid var(--border);
-  background: white;
-}
-.card-caption-preview {
-  flex: 1; font-size: 12px; color: var(--text-mid);
-  line-height: 1.4; max-height: 40px; overflow: hidden;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-}
-.btn-copy, .btn-download {
-  flex-shrink: 0; padding: 8px 14px;
-  border-radius: 10px; border: none;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 12px; font-weight: 600;
-  cursor: pointer; transition: all 0.2s;
-  display: flex; align-items: center; gap: 5px;
-}
-.btn-copy { background: var(--warm); color: var(--text-mid); border: 1px solid var(--border); }
-.btn-copy:hover { background: var(--cyan-lt); color: var(--cyan); border-color: var(--cyan); }
-.btn-download { background: var(--charcoal); color: white; }
-.btn-download:hover { background: var(--cyan); }
-.btn-copy.copied { background: var(--sage-lt); color: var(--sage); border-color: var(--sage); }
-
-/* ── Canva Modal ──────────────────────────────────────────── */
-.modal-overlay {
-  position: fixed; inset: 0; z-index: 200;
-  background: rgba(0,0,0,0.5);
-  display: none; align-items: center; justify-content: center;
-  padding: 20px;
-}
-.modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
-.modal-card {
-  background: white; border-radius: 20px;
-  padding: 36px; max-width: 500px; width: 100%;
-  box-shadow: 0 24px 80px rgba(0,0,0,0.2);
-  animation: slideUp 0.3s ease;
-}
-.modal-title { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--charcoal); margin-bottom: 6px; }
-.modal-sub { font-size: 13px; color: var(--text-mid); margin-bottom: 24px; line-height: 1.6; }
-.modal-steps { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
-.modal-step { display: flex; gap: 14px; align-items: flex-start; }
-.step-num {
-  width: 28px; height: 28px; border-radius: 50%;
-  background: var(--charcoal); color: white;
-  font-size: 13px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.step-text { font-size: 13px; line-height: 1.6; color: var(--text-mid); padding-top: 3px; }
-.step-text b { color: var(--text); }
-.modal-close {
-  width: 100%; padding: 14px;
-  background: var(--charcoal); color: white;
-  border: none; border-radius: 12px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px; font-weight: 600;
-  cursor: pointer; transition: background 0.2s;
-}
-.modal-close:hover { background: var(--cyan); }
-
-/* ── Input Area ───────────────────────────────────────────── */
-.input-area {
-  background: white;
-  border-top: 1px solid var(--border);
-  padding: 16px 20px;
-  flex-shrink: 0;
-}
-.input-row {
-  display: flex; gap: 10px; align-items: flex-end;
-  background: var(--cream);
-  border: 1.5px solid var(--border);
-  border-radius: 16px;
-  padding: 10px 10px 10px 16px;
-  transition: border-color 0.2s;
-}
-.input-row:focus-within { border-color: var(--cyan); }
-#chat-input {
-  flex: 1; border: none; background: transparent; outline: none;
-  font-family: 'DM Sans', sans-serif; font-size: 14px;
-  color: var(--text); resize: none; max-height: 120px;
-  line-height: 1.5;
-}
-#chat-input::placeholder { color: var(--text-lt); }
-.send-btn {
-  width: 38px; height: 38px; border-radius: 10px;
-  background: var(--charcoal); color: white; border: none;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s; flex-shrink: 0;
-}
-.send-btn:hover { background: var(--cyan); }
-.send-btn:disabled { background: var(--border); cursor: not-allowed; }
-.send-btn svg { width: 16px; height: 16px; }
-.input-hint { font-size: 11px; color: var(--text-lt); text-align: center; margin-top: 8px; }
-
-/* ── Animations ───────────────────────────────────────────── */
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes bounce { 0%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-6px); } }
-</style>
+        /* Input area */
+        .input-area {
+            background: white;
+            border-top: 1px solid #E8E0D8;
+            padding: 16px 20px;
+            flex-shrink: 0;
+        }
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            background: #FDF8F3;
+            border: 1.5px solid #E8E0D8;
+            border-radius: 16px;
+            padding: 10px 10px 10px 16px;
+        }
+        .input-row:focus-within { border-color: #00BCC8; }
+        textarea {
+            flex: 1;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            resize: none;
+            max-height: 120px;
+            line-height: 1.5;
+        }
+        textarea::placeholder { color: #9898A8; }
+        .send-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: #2C2C2C;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .send-btn:hover { background: #00BCC8; }
+        .send-btn:disabled { background: #E8E0D8; cursor: not-allowed; }
+        .send-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+        .input-hint {
+            font-size: 11px;
+            color: #9898A8;
+            text-align: center;
+            margin-top: 8px;
+        }
+    </style>
 </head>
 <body>
 
-<!-- ── Setup Screen ── -->
+<!-- Setup screen -->
 <div id="setup-screen">
-  <div class="setup-card">
-    <div class="setup-logo">
-      <svg class="setup-logo-icon" viewBox="0 0 36 36" fill="none">
-        <rect x="2" y="2" width="14" height="14" rx="3" fill="#00BCC8"/>
-        <rect x="20" y="2" width="14" height="14" rx="3" fill="#F5C518"/>
-        <rect x="2" y="20" width="14" height="14" rx="3" fill="#E8175D"/>
-        <rect x="20" y="20" width="14" height="14" rx="3" fill="#00BCC8" opacity="0.45"/>
-      </svg>
-      <div class="setup-logo-text">Mastering<span>It</span></div>
+    <div class="setup-card">
+        <div class="logo">
+            <div class="logo-icon"></div>
+            <div class="logo-text">Mastering<span>It</span></div>
+        </div>
+        <h2>Meet MUSE ✦</h2>
+        <p class="sub">Your personal creative partner – always ready to brainstorm Facebook posts, course outlines, newsletters, and more.</p>
+        <div class="label">Your Gemini API Key</div>
+        <input type="password" id="api-key" placeholder="AIzaSy...">
+        <div class="checkbox-row">
+            <input type="checkbox" id="remember-key">
+            <label for="remember-key">Remember my API key on this browser</label>
+        </div>
+        <button onclick="startApp()">Open MUSE →</button>
+        <p class="note">Your key is stored only in your browser and never sent anywhere except directly to Google Gemini. Get a free key at aistudio.google.com</p>
     </div>
-    <div class="setup-title">Meet MUSE ✦</div>
-    <p class="setup-sub">Your personal creative assistant — ready to generate on-brand Facebook posts, course outlines, and newsletter copy whenever you need it.</p>
-    <div class="setup-label">Your Gemini API Key</div>
-    <input class="setup-input" type="password" id="api-key-input" placeholder="AIzaSy..." autocomplete="off">
-    <!-- 👇 Remember me checkbox -->
-    <div class="remember-row">
-      <input type="checkbox" id="remember-key-checkbox">
-      <label for="remember-key-checkbox">Remember my API key on this browser</label>
-    </div>
-    <button class="setup-btn" onclick="startApp()">Open MUSE →</button>
-    <p class="setup-note">Your key is stored only in this browser session and never sent anywhere except directly to Google Gemini to power MUSE. Get a free key at aistudio.google.com — no credit card required.</p>
-  </div>
 </div>
 
-<!-- ── Main App ── -->
+<!-- Main app -->
 <div id="app">
+    <div class="header">
+        <div class="header-left">
+            <div class="header-logo"></div>
+            <span class="header-name">MUSE</span>
+            <span class="header-tag">Mastering It</span>
+        </div>
+        <button class="new-session" onclick="newSession()">+ New Session</button>
+    </div>
 
-  <!-- Header -->
-  <div class="header">
-    <div class="header-left">
-      <svg class="header-logo" viewBox="0 0 32 32" fill="none">
-        <rect x="1" y="1" width="13" height="13" rx="3" fill="#00BCC8"/>
-        <rect x="18" y="1" width="13" height="13" rx="3" fill="#F5C518"/>
-        <rect x="1" y="18" width="13" height="13" rx="3" fill="#E8175D"/>
-        <rect x="18" y="18" width="13" height="13" rx="3" fill="#00BCC8" opacity="0.4"/>
-      </svg>
-      <span class="header-name">MUSE</span>
-      <span class="header-tag">Mastering It</span>
+    <div class="chat-area" id="chat-area">
+        <div class="welcome" id="welcome">
+            <div class="welcome-icon">✦</div>
+            <div class="welcome-title">Hi Maryke — what are we creating today?</div>
+            <p class="welcome-sub">I know your business, your voice, and what works on Facebook. Just tell me what you need.</p>
+            <div class="quick-prompts">
+                <div class="qp" onclick="sendQuick('Give me this week\'s Facebook content plan')">📅 This week's content plan</div>
+                <div class="qp" onclick="sendQuick('I need a post promoting the Study Skills Workshop')">📚 Study Skills post</div>
+                <div class="qp" onclick="sendQuick('Write me a personal story post from Maryke')">💛 Personal story post</div>
+                <div class="qp" onclick="sendQuick('Give me a post promoting the Career Aptitude Test')">🎯 Career Test post</div>
+                <div class="qp" onclick="sendQuick('Draft this month\'s newsletter')">📨 Monthly newsletter</div>
+                <div class="qp" onclick="sendQuick('Give me a course outline for the CV Writing Course')">📝 CV Course outline</div>
+            </div>
+        </div>
     </div>
-    <div class="header-right">
-      <span class="header-pill">✦ Level 3 AI Agent</span>
-      <button class="new-session-btn" onclick="newSession()">+ New Session</button>
-    </div>
-  </div>
 
-  <!-- Chat -->
-  <div class="chat-area" id="chat-area">
-    <div class="welcome" id="welcome">
-      <div class="welcome-icon">✦</div>
-      <div class="welcome-title">Hi Maryke — what are we creating today?</div>
-      <p class="welcome-sub">I know your business, your voice, and what works on Facebook. Just tell me what you need.</p>
-      <div class="quick-prompts">
-        <div class="qp" onclick="sendQuick('Give me this week\'s Facebook content plan')">📅 This week's content plan</div>
-        <div class="qp" onclick="sendQuick('I need a post promoting the Study Skills Workshop')">📚 Study Skills post</div>
-        <div class="qp" onclick="sendQuick('Write me a personal story post from Maryke')">💛 Personal story post</div>
-        <div class="qp" onclick="sendQuick('Give me a post promoting the Career Aptitude Test')">🎯 Career Test post</div>
-        <div class="qp" onclick="sendQuick('Draft this month\'s newsletter')">📨 Monthly newsletter</div>
-        <div class="qp" onclick="sendQuick('Give me a course outline for the CV Writing Course')">📝 CV Course outline</div>
-      </div>
+    <div class="input-area">
+        <div class="input-row">
+            <textarea id="user-input" rows="1" placeholder="Tell me what you need – a post, a plan, a course outline…" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+            <button class="send-btn" id="send-btn" onclick="sendMessage()">
+                <svg viewBox="0 0 16 16">
+                    <line x1="14" y1="2" x2="2" y2="14"></line>
+                    <polyline points="2,2 14,2 14,14"></polyline>
+                </svg>
+            </button>
+        </div>
+        <div class="input-hint">MUSE self‑reviews every response against Mastering It's brand voice before you see it. Reflection Pattern active ✦</div>
     </div>
-  </div>
-
-  <!-- Input -->
-  <div class="input-area">
-    <div class="input-row">
-      <textarea id="chat-input" rows="1" placeholder="Tell me what you need — a post, a plan, a course outline…" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-      <button class="send-btn" id="send-btn" onclick="sendMessage()">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <line x1="14" y1="2" x2="2" y2="14"/><polyline points="2,2 14,2 14,14"/>
-        </svg>
-      </button>
-    </div>
-    <div class="input-hint">MUSE self-reviews every response against Mastering It's brand voice before you see it &nbsp;·&nbsp; Powered by Gemini · Reflection Pattern active ✦</div>
-  </div>
-</div>
-
-<!-- Canva Instructions Modal -->
-<div class="modal-overlay" id="canva-modal">
-  <div class="modal-card">
-    <div class="modal-title">How to use in Canva ✦</div>
-    <p class="modal-sub">Your post design has been downloaded. Here is how to recreate it perfectly in Canva in under 5 minutes.</p>
-    <div class="modal-steps">
-      <div class="modal-step">
-        <div class="step-num">1</div>
-        <div class="step-text">Open <b>Canva.com</b> and click <b>Create a Design → Instagram Post (1080 × 1080px)</b></div>
-      </div>
-      <div class="modal-step">
-        <div class="step-num">2</div>
-        <div class="step-text">Upload the downloaded image as a <b>background reference</b> — use Elements → Uploads. Set opacity to 30% so you can trace the layout.</div>
-      </div>
-      <div class="modal-step">
-        <div class="step-num">3</div>
-        <div class="step-text">Recreate the layout using Canva's shapes and text boxes. Use font <b>Playfair Display</b> for headlines and <b>DM Sans</b> for body text.</div>
-      </div>
-      <div class="modal-step">
-        <div class="step-num">4</div>
-        <div class="step-text">Mastering It brand colours: Charcoal <b>#2C2C2C</b> · Cyan <b>#00BCC8</b> · Yellow <b>#F5C518</b> · Pink <b>#E8175D</b></div>
-      </div>
-      <div class="modal-step">
-        <div class="step-num">5</div>
-        <div class="step-text">Paste the caption text you copied from MUSE into your Canva caption field when scheduling or posting to Facebook.</div>
-      </div>
-    </div>
-    <button class="modal-close" onclick="closeModal()">Got it — let me open Canva</button>
-  </div>
 </div>
 
 <script>
-// ── State ─────────────────────────────────────────────────────────────────────
+// ---------- State ----------
 let API_KEY = '';
 let messages = [];
 let isLoading = false;
 
-// ── Colour palettes for cards ─────────────────────────────────────────────────
-const PALETTES = [
-  { name: 'cyan',   main: '#00BCC8', light: '#E0F8FA', dark: '#007A85', text: '#1E1E1E' },
-  { name: 'pink',   main: '#E8175D', light: '#FDE8EF', dark: '#A80F43', text: '#1E1E1E' },
-  { name: 'yellow', main: '#F5C518', light: '#FEF9E3', dark: '#C8A010', text: '#1E1E1E' },
-  { name: 'sage',   main: '#6B9E78', light: '#EBF5EE', dark: '#4A7055', text: '#1E1E1E' },
-  { name: 'charcoal',main:'#2C2C2C',light: '#F0EDEA', dark: '#1A1A1A', text: '#1E1E1E' },
-  { name: 'peach',  main: '#E8834A', light: '#FDF0E8', dark: '#B85C28', text: '#1E1E1E' },
-  { name: 'lavender',main:'#8B7EC8',light: '#EEEAF8', dark: '#5A4D9E', text: '#1E1E1E' },
-];
-
-const LAYOUTS = ['a','b','c','d','e','f','g','h'];
-const PILLAR_COLOURS = {
-  'Student Success':     '#00BCC8',
-  'Parent Support':      '#6B9E78',
-  'Course Promotion':    '#E8175D',
-  'Team & Platform':     '#8B7EC8',
-  'Community':           '#F5C518',
-};
-
-// ── Updated System Prompt with clear rules for when to use cards ──
-const SYSTEM_PROMPT = `You are MUSE, the creative AI assistant for Mastering It — a South African tutoring and education business owned by Maryke Jooste. You are a Level 3 AI Agent with a Reflection Pattern: you internally draft content, critique it against the Mastering It brand voice, then deliver only refined, on-brand output.
+// ---------- Brand Data (embedded) ----------
+const SYSTEM_PROMPT = `You are MUSE, the creative AI assistant for Mastering It – a South African tutoring and education business owned by Maryke Jooste. You are a Level 3 AI Agent with a Reflection Pattern: you internally draft content, critique it against the Mastering It brand voice, then deliver only refined, on-brand output.
 
 BUSINESS: Mastering It | Owner: Maryke Jooste | WhatsApp: 072 372 4353 | Email: maryke@masteringit.co.za | Website: www.masteringit.co.za | Primary platform: Facebook
 
-SERVICES: Tutoring (Gr1-12 R230/hr, tertiary R270/hr), Study Skills classes (R260/hr) & Workshop (R520/4hrs over 2 days), NBI Brain Profile (R590/R790/R1090), Career Aptitude Test (R1750 incl full report & feedback), Career Coaching, Life Skills Workshops, Business Start-Up Course, CV Writing Course.
+SERVICES:
+- Tutoring: Gr1-12 R230/hr, tertiary R270/hr
+- Study Skills classes: R260/hr
+- Study Skills Workshop: R520 for 4hrs (over 2 days)
+- NBI Brain Profile: R590 / R790 / R1090
+- Career Aptitude Test: R1750 (includes full report & feedback)
+- Career Coaching, Life Skills Workshops, Business Start-Up Course, CV Writing Course.
 
-BRAND VOICE: Warm, approachable, professional, energetic, relational. A knowledgeable friend — not a corporation. Never corporate, stiff, or pushy. Short sentences. Max ONE exclamation mark per post. No hollow buzzwords. Use "we" for business, "you" for reader.
+BRAND VOICE: Warm, approachable, professional, energetic, relational. A knowledgeable friend – not a corporation. Never corporate, stiff, or pushy. Short sentences. Max ONE exclamation mark per post. No hollow buzzwords. Use "we" for business, "you" for reader.
 
-FACEBOOK STRATEGY — The golden rule: every post must TEACH something, CREATE CONNECTION, or INVITE CONVERSATION. Value-first always. Personal/story posts outperform promotional posts. Question posts drive comments. Soft CTAs ("Drop a comment") beat hard CTAs ("Click now"). Pure promotional posts do NOT work.
+FACEBOOK STRATEGY: Every post must TEACH something, CREATE CONNECTION, or INVITE CONVERSATION. Value-first always. Personal/story posts outperform promotional posts. Question posts drive comments. Soft CTAs ("Drop a comment") beat hard CTAs ("Click now"). Pure promotional posts do NOT work.
 
 CONTENT PILLARS: 1) Student Success 2) Parent Support 3) Course Promotion 4) Team & Platform 5) Community & Conversation
 
-SAFETY RULES: Never auto-post. Never fabricate testimonials. Never mention competitors. Max 1 exclamation mark. Never invent course credentials.
+CANVA TEMPLATES (recommend by name in your output):
+- Template A: Bold Diagonal – great for tips and educational content
+- Template B: Split Block – works well for comparisons or before/after
+- Template C: Quote Card – ideal for testimonials or inspirational quotes
+- Template D: Tip Card – step-by-step advice
+- Template E: Minimal Clean – simple announcements
+- Template F: Full Colour Bold – high-impact promotions
+- Template G: Story Card – personal stories from Maryke
+- Template H: Three Points – list-style content
 
----
-RESPONSE FORMAT RULES:
+RULES:
+- Never auto-post. Never fabricate testimonials. Never mention competitors.
+- Max 1 exclamation mark per post.
+- For course outlines, provide module-by-module structure with learning outcomes and recommended format (duration, delivery).
+- For newsletters, draft all sections: personal opening, tip of the month, service spotlight, competition, warm sign-off.
+- If a request is vague, ask ONE focused clarifying question (e.g., "Are we speaking to parents or learners this week?"). Never ask more than one.
+- Always include a Canva template recommendation at the end of each post or piece of content.
 
-1. **ONLY generate JSON cards (wrapped in <CARDS> tags) when the user explicitly asks for a Facebook post, a weekly content plan, or social media content.**  
-   - Examples of explicit prompts: "Give me this week's Facebook content plan", "I need a post promoting the Study Skills Workshop", "Create a post about the Career Aptitude Test".  
-   - When you generate cards, follow the JSON structure below, and always vary layouts and palettes.
+RESPONSE FORMAT:
+- For Facebook posts: Provide the full caption (ready to post) + "Recommended Canva template: [name]"
+- For weekly plans: Provide 5 posts (Mon-Fri) each with caption + template recommendation.
+- For course outlines: Provide module titles, learning outcomes, and session format.
+- For newsletters: Provide all sections as described.
+- For other requests (FAQs, general help): Provide friendly, conversational answers.
 
-2. **For ANY OTHER REQUEST** — such as course outlines, newsletters, FAQ answers, general business information, or just chatting — respond with **conversational text only**. Do NOT include <CARDS> or JSON.
+The Reflection Pattern: You will internally generate a draft, then review it against the brand rules above, refine it, and output only the final version. Never mention the reflection process to the user – just deliver the polished content.
 
-3. **JSON card format (only for social media posts):**  
-   - layout: one of "a","b","c","d","e","f","g","h" (vary these, never repeat same layout in one batch)  
-   - palette: one of "cyan","pink","yellow","sage","charcoal","peach","lavender" (vary these)  
-   - badge: short label (2-4 words, e.g. "Study Tips" or "New Course")  
-   - eyebrow: short ALL CAPS label (e.g. "FOR PARENTS" or "EXAM SEASON")  
-   - headline: punchy headline (4-8 words, title case, for the visual card)  
-   - subtext: 1-2 sentences for the card visual (not the full caption)  
-   - points: array of exactly 3 short points (for layout h only, otherwise empty array [])  
-   - pillar: content pillar name  
-   - audience: target audience  
-   - caption: full Facebook caption (ready to post, on-brand, value-first, max 150 words)  
-   - template_note: which Canva template style this resembles  
+Start every session by welcoming Maryke warmly.`;
 
-   After the JSON block, write a brief conversational message to Maryke about the posts.
-
-   For weekly plans → exactly 3 card objects.  
-   For individual post requests → exactly 1 card object.
-
-4. **Examples of correct behavior:**  
-   - User: "Give me a course outline for the CV Writing Course" → Respond with a friendly, detailed outline (no cards).  
-   - User: "I need a post for the Study Skills Workshop" → Generate exactly one card object inside <CARDS> plus a short conversational intro/outro.
-
-Remember: cards are ONLY for social posts. All other content is plain text.`;
-
-// ── Updated Reflection Prompt (no confusion about user-provided drafts) ──
 const REFLECTION_PROMPT = `You are an internal brand quality reviewer for Mastering It. Review the DRAFT content you just created and check it against these brand rules:
 1. Tone: warm, approachable, relational — NOT corporate or pushy
 2. Max ONE exclamation mark per post caption
 3. Value-first: does the post teach, connect, or invite conversation?
 4. No hollow buzzwords or hard sell language
 5. Facebook-appropriate length (captions under 150 words)
-6. JSON card format is correct with all required fields
-7. Layouts and palettes are varied within the batch
+6. Course outlines are structured with modules and outcomes
+7. Newsletter includes all expected sections
 
-If anything violates the rules, fix it and return the corrected full response. If everything is good, return it as-is. DO NOT mention that you're reviewing a draft or that the user provided anything — this is your internal self-review. Just return the final refined response including any <CARDS> tags.`;
+If anything violates the rules, fix it and return the corrected full response. If everything is good, return it as-is. DO NOT mention that you're reviewing a draft – this is an internal step. Just return the final refined response.`;
 
-// ── App Start ─────────────────────────────────────────────────────────────────
+// ---------- Setup ----------
 function startApp() {
-  const keyInput = document.getElementById('api-key-input');
-  const key = keyInput.value.trim();
-  const remember = document.getElementById('remember-key-checkbox').checked;
+    const keyInput = document.getElementById('api-key');
+    const key = keyInput.value.trim();
+    const remember = document.getElementById('remember-key').checked;
 
-  if (!key || !key.startsWith('AIza')) {
-    alert('Please enter a valid Gemini API key (starts with AIza). Get one free at aistudio.google.com');
-    return;
-  }
+    if (!key || !key.startsWith('AIza')) {
+        alert('Please enter a valid Gemini API key (starts with AIza). Get one free at aistudio.google.com');
+        return;
+    }
 
-  API_KEY = key;
+    API_KEY = key;
+    if (remember) {
+        localStorage.setItem('muse_api_key', key);
+    } else {
+        localStorage.removeItem('muse_api_key');
+    }
 
-  // Save to localStorage if "remember" is checked
-  if (remember) {
-    localStorage.setItem('muse_api_key', key);
-  } else {
-    // If they don't want to remember, remove any previously saved key
-    localStorage.removeItem('muse_api_key');
-  }
-
-  document.getElementById('setup-screen').style.display = 'none';
-  const app = document.getElementById('app');
-  app.classList.add('visible');
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('app').classList.add('visible');
 }
 
-// On page load, pre-fill API key if saved
-window.addEventListener('load', function() {
-  const savedKey = localStorage.getItem('muse_api_key');
-  if (savedKey) {
-    document.getElementById('api-key-input').value = savedKey;
-    document.getElementById('remember-key-checkbox').checked = true;
-  }
+// On load, pre-fill saved key
+window.addEventListener('load', () => {
+    const saved = localStorage.getItem('muse_api_key');
+    if (saved) {
+        document.getElementById('api-key').value = saved;
+        document.getElementById('remember-key').checked = true;
+    }
 });
 
 function newSession() {
-  messages = [];
-  const chat = document.getElementById('chat-area');
-  chat.innerHTML = `<div class="welcome" id="welcome">
-    <div class="welcome-icon">✦</div>
-    <div class="welcome-title">Hi Maryke — what are we creating today?</div>
-    <p class="welcome-sub">I know your business, your voice, and what works on Facebook. Just tell me what you need.</p>
-    <div class="quick-prompts">
-      <div class="qp" onclick="sendQuick('Give me this week\\'s Facebook content plan')">📅 This week's content plan</div>
-      <div class="qp" onclick="sendQuick('I need a post promoting the Study Skills Workshop')">📚 Study Skills post</div>
-      <div class="qp" onclick="sendQuick('Write me a personal story post from Maryke')">💛 Personal story post</div>
-      <div class="qp" onclick="sendQuick('Give me a post promoting the Career Aptitude Test')">🎯 Career Test post</div>
-      <div class="qp" onclick="sendQuick('Draft this month\\'s newsletter')">📨 Monthly newsletter</div>
-      <div class="qp" onclick="sendQuick('Give me a course outline for the CV Writing Course')">📝 CV Course outline</div>
-    </div>
-  </div>`;
+    messages = [];
+    const chat = document.getElementById('chat-area');
+    chat.innerHTML = `<div class="welcome" id="welcome">
+        <div class="welcome-icon">✦</div>
+        <div class="welcome-title">Hi Maryke — what are we creating today?</div>
+        <p class="welcome-sub">I know your business, your voice, and what works on Facebook. Just tell me what you need.</p>
+        <div class="quick-prompts">
+            <div class="qp" onclick="sendQuick('Give me this week\\'s Facebook content plan')">📅 This week's content plan</div>
+            <div class="qp" onclick="sendQuick('I need a post promoting the Study Skills Workshop')">📚 Study Skills post</div>
+            <div class="qp" onclick="sendQuick('Write me a personal story post from Maryke')">💛 Personal story post</div>
+            <div class="qp" onclick="sendQuick('Give me a post promoting the Career Aptitude Test')">🎯 Career Test post</div>
+            <div class="qp" onclick="sendQuick('Draft this month\\'s newsletter')">📨 Monthly newsletter</div>
+            <div class="qp" onclick="sendQuick('Give me a course outline for the CV Writing Course')">📝 CV Course outline</div>
+        </div>
+    </div>`;
 }
 
-// ── Messaging ─────────────────────────────────────────────────────────────────
+// ---------- Messaging ----------
 function handleKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
 }
+
 function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
 }
+
 function sendQuick(text) {
-  document.getElementById('chat-input').value = text;
-  sendMessage();
-}
-
-async function sendMessage() {
-  const input = document.getElementById('chat-input');
-  const text = input.value.trim();
-  if (!text || isLoading) return;
-
-  hideWelcome();
-  appendMessage('user', text);
-  input.value = '';
-  input.style.height = 'auto';
-
-  messages.push({ role: 'user', content: text });
-  await callMUSE();
+    document.getElementById('user-input').value = text;
+    sendMessage();
 }
 
 function hideWelcome() {
-  const w = document.getElementById('welcome');
-  if (w) w.remove();
+    const w = document.getElementById('welcome');
+    if (w) w.remove();
 }
 
-function appendMessage(role, content, isHTML = false) {
-  const chat = document.getElementById('chat-area');
-  const div = document.createElement('div');
-  div.className = `msg ${role}`;
-  const avatar = role === 'muse'
-    ? `<div class="msg-avatar">M</div>`
-    : `<div class="msg-avatar">MJ</div>`;
-  const bubble = isHTML
-    ? `<div class="msg-content">${content}</div>`
-    : `<div class="msg-content"><div class="msg-bubble">${escapeHtml(content)}</div></div>`;
-  div.innerHTML = avatar + bubble;
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
-  return div;
+function appendMessage(role, text, isHtml = false) {
+    const chat = document.getElementById('chat-area');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `msg ${role}`;
+    const avatar = role === 'muse' ? 'M' : 'MJ';
+    const bubbleContent = isHtml ? text : `<div class="bubble">${escapeHtml(text).replace(/\n/g, '<br>')}</div>`;
+    msgDiv.innerHTML = `<div class="avatar">${avatar}</div><div class="msg-content">${bubbleContent}</div>`;
+    chat.appendChild(msgDiv);
+    chat.scrollTop = chat.scrollHeight;
+}
+
+function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 function showThinking() {
-  const chat = document.getElementById('chat-area');
-  const div = document.createElement('div');
-  div.className = 'msg muse'; div.id = 'thinking-msg';
-  div.innerHTML = `<div class="msg-avatar">M</div>
-    <div class="msg-content">
-      <div class="thinking">
-        <span class="thinking-text">Drafting & reflecting on your brief…</span>
-        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-      </div>
-    </div>`;
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
+    const chat = document.getElementById('chat-area');
+    const div = document.createElement('div');
+    div.className = 'msg muse thinking';
+    div.id = 'thinking-msg';
+    div.innerHTML = `<div class="avatar">M</div>
+        <div class="msg-content">
+            <div class="bubble">
+                <span>Drafting & reflecting on your brief…</span>
+                <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            </div>
+        </div>`;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
 }
+
 function hideThinking() {
-  const t = document.getElementById('thinking-msg');
-  if (t) t.remove();
+    const el = document.getElementById('thinking-msg');
+    if (el) el.remove();
 }
 
-// ── API Call with Reflection Pattern ─────────────────────────────────────────
+async function sendMessage() {
+    const input = document.getElementById('user-input');
+    const text = input.value.trim();
+    if (!text || isLoading) return;
+
+    hideWelcome();
+    appendMessage('user', text);
+    input.value = '';
+    input.style.height = 'auto';
+
+    messages.push({ role: 'user', content: text });
+    await callMUSE();
+}
+
 async function callMUSE() {
-  isLoading = true;
-  document.getElementById('send-btn').disabled = true;
-  showThinking();
+    isLoading = true;
+    document.getElementById('send-btn').disabled = true;
+    showThinking();
 
-  try {
-    // Stage 1: Draft
-    const draft = await callAPI(messages, SYSTEM_PROMPT);
-
-    // Stage 2: Reflect
-    const reflectMessages = [
-      ...messages,
-      { role: 'assistant', content: draft },
-      { role: 'user', content: REFLECTION_PROMPT }
-    ];
-    const refined = await callAPI(reflectMessages, SYSTEM_PROMPT);
-
-    hideThinking();
-    messages.push({ role: 'assistant', content: refined });
-    renderResponse(refined);
-
-  } catch (err) {
-    hideThinking();
-    appendMessage('muse', `Sorry, something went wrong: ${err.message}. Please check your API key and try again.`);
-  }
-
-  isLoading = false;
-  document.getElementById('send-btn').disabled = false;
-}
-
-async function callAPI(msgs, systemPrompt) {
-  // Convert message history to Gemini format (roles: "user" / "model")
-  const contents = msgs.map(m => ({
-    role: m.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: m.content }]
-  }));
-
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: systemPrompt }] },
-        contents: contents,
-        generationConfig: {
-          temperature: 0.85,
-          maxOutputTokens: 4000
-        }
-      })
-    }
-  );
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error?.message || 'Gemini API error');
-  }
-  const data = await res.json();
-  return data.candidates[0].content.parts[0].text;
-}
-
-// ── Response Rendering ─────────────────────────────────────────────────────────
-function renderResponse(text) {
-  const cardsMatch = text.match(/<CARDS>([\s\S]*?)<\/CARDS>/);
-
-  if (cardsMatch) {
     try {
-      const cards = JSON.parse(cardsMatch[1].trim());
-      const prose = text.replace(/<CARDS>[\s\S]*?<\/CARDS>/, '').trim();
+        // Stage 1: Generate draft
+        const draft = await callGemini(messages, SYSTEM_PROMPT);
 
-      // Render cards first
-      const cardsHTML = buildCardsHTML(cards);
-      appendMessage('muse', cardsHTML, true);
+        // Stage 2: Reflect and refine
+        const reflectMessages = [
+            ...messages,
+            { role: 'assistant', content: draft },
+            { role: 'user', content: REFLECTION_PROMPT }
+        ];
+        const refined = await callGemini(reflectMessages, SYSTEM_PROMPT);
 
-      // Then prose
-      if (prose) {
-        const proseDiv = document.createElement('div');
-        proseDiv.className = 'msg muse';
-        proseDiv.innerHTML = `<div class="msg-avatar">M</div>
-          <div class="msg-content"><div class="msg-bubble">${formatProse(prose)}</div></div>`;
-        document.getElementById('chat-area').appendChild(proseDiv);
-      }
-    } catch (e) {
-      appendMessage('muse', formatProse(text), true);
+        hideThinking();
+        messages.push({ role: 'assistant', content: refined });
+        appendMessage('muse', refined);
+
+    } catch (err) {
+        hideThinking();
+        appendMessage('muse', `Sorry, something went wrong: ${err.message}. Please check your API key and try again.`);
+    } finally {
+        isLoading = false;
+        document.getElementById('send-btn').disabled = false;
     }
-  } else {
-    appendMessage('muse', formatProse(text), true);
-  }
-
-  document.getElementById('chat-area').scrollTop = document.getElementById('chat-area').scrollHeight;
 }
 
-function formatProse(text) {
-  return `<div class="msg-bubble">${text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/\n\n/g, '<br><br>')
-    .replace(/\n/g, '<br>')
-  }</div>`;
-}
+async function callGemini(msgs, systemPrompt) {
+    const contents = msgs.map(m => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }]
+    }));
 
-// ── Card Builder ──────────────────────────────────────────────────────────────
-function buildCardsHTML(cards) {
-  const label = cards.length > 1
-    ? `<div class="cards-label">✦ ${cards.length} posts generated — self-reviewed against Mastering It brand voice</div>`
-    : `<div class="cards-label">✦ Post generated — self-reviewed against Mastering It brand voice</div>`;
+    const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`,
+        {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                contents: contents,
+                generationConfig: { temperature: 0.7, maxOutputTokens: 4000 }
+            })
+        }
+    );
 
-  const cardDivs = cards.map((card, i) => buildSingleCard(card, i)).join('');
-  return `<div class="cards-container">${label}${cardDivs}</div>`;
-}
+    if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error?.message || 'Gemini API error');
+    }
 
-function buildSingleCard(card, idx) {
-  const pal = PALETTES.find(p => p.name === card.palette) || PALETTES[0];
-  const pillarCol = PILLAR_COLOURS[card.pillar] || pal.main;
-  const cardId = `card-${Date.now()}-${idx}`;
-
-  const visual = buildVisualCard(card, pal, cardId);
-  const pillarBadge = `style="background:${pillarCol}20;color:${pillarCol}"`;
-
-  return `<div class="post-card-wrap">
-    <div class="post-card-meta">
-      <span class="meta-pillar" ${pillarBadge}>${card.pillar}</span>
-      <span class="meta-audience">→ ${card.audience}</span>
-      <span class="meta-template">${card.template_note || ''}</span>
-    </div>
-    ${visual}
-    <div class="card-actions">
-      <div class="card-caption-preview">${escapeHtml(card.caption)}</div>
-      <button class="btn-copy" onclick="copyCaption(this, ${JSON.stringify(card.caption).replace(/'/g,"&#39;")})">
-        📋 Copy caption
-      </button>
-      <button class="btn-download" onclick="downloadCard('${cardId}', ${JSON.stringify(card.caption).replace(/'/g,"&#39;")})">
-        ⬇ Download
-      </button>
-    </div>
-  </div>`;
-}
-
-function buildVisualCard(card, pal, id) {
-  const layout = card.layout || 'a';
-  const logoSVG = `<svg width="22" height="22" viewBox="0 0 32 32" fill="none">
-    <rect x="1" y="1" width="13" height="13" rx="3" fill="#00BCC8"/>
-    <rect x="18" y="1" width="13" height="13" rx="3" fill="#F5C518"/>
-    <rect x="1" y="18" width="13" height="13" rx="3" fill="#E8175D"/>
-    <rect x="18" y="18" width="13" height="13" rx="3" fill="#00BCC8" opacity="0.4"/>
-  </svg>`;
-  const logoText = `<div style="font-size:3.2%;font-weight:700;color:white">Mastering<b>It</b></div>`;
-  const footer = `<span>072 372 4353</span><span style="color:${pal.main}">·</span><span>masteringit.co.za</span>`;
-
-  let inner = '';
-
-  if (layout === 'a') {
-    inner = `
-      <div class="lc-diagonal" style="background:${pal.main}"></div>
-      <div class="lc-logo">${logoSVG}${logoText}</div>
-      <div class="lc-badge" style="color:${pal.main}">${escapeHtml(card.badge)}</div>
-      <div class="lc-content">
-        <div class="lc-eyebrow" style="color:${pal.main}">${escapeHtml(card.eyebrow)}</div>
-        <div class="lc-headline">${escapeHtml(card.headline)}</div>
-        <div class="lc-sub">${escapeHtml(card.subtext)}</div>
-      </div>
-      <div class="lc-footer">${footer}</div>`;
-  } else if (layout === 'b') {
-    inner = `
-      <div class="lc-left" style="background:${pal.main}">
-        <div class="lc-logo">${logoSVG}${logoText}</div>
-        <div class="lc-headline">${escapeHtml(card.headline)}</div>
-        <div class="lc-pillar-tag">${escapeHtml(card.pillar)}</div>
-      </div>
-      <div class="lc-right">
-        <div class="lc-eyebrow" style="color:${pal.main}">${escapeHtml(card.eyebrow)}</div>
-        <div class="lc-sub">${escapeHtml(card.subtext)}</div>
-        <div class="lc-cta" style="background:${pal.main}">Mastering It</div>
-      </div>
-      <div class="lc-footer" style="position:absolute;bottom:2%;right:4%;font-size:1.9%;color:#aaa">${escapeHtml(card.badge)}</div>`;
-  } else if (layout === 'c') {
-    inner = `
-      <div class="lc-badge" style="background:${pal.main}">${escapeHtml(card.badge)}</div>
-      <div class="lc-qmark" style="color:${pal.main}">"</div>
-      <div class="lc-headline" style="color:${pal.dark||pal.main}">${escapeHtml(card.headline)}</div>
-      <div class="lc-rule" style="background:${pal.main}"></div>
-      <div class="lc-sub">${escapeHtml(card.subtext)}</div>
-      <div class="lc-logo">${logoSVG}<div style="font-size:3%;font-weight:700;color:#2C2C2C">Mastering<b>It</b></div></div>`;
-  } else if (layout === 'd') {
-    inner = `
-      <div class="lc-top" style="background:${pal.light}">
-        <div class="lc-logo">${logoSVG}<div style="font-size:3.2%;font-weight:700;color:${pal.dark||pal.main}">MasteringIt</div></div>
-        <div class="lc-number" style="color:${pal.main}">✦</div>
-        <div class="lc-eyebrow" style="color:${pal.main}">${escapeHtml(card.eyebrow)}</div>
-        <div class="lc-headline" style="color:${pal.dark||'#2C2C2C'}">${escapeHtml(card.headline)}</div>
-      </div>
-      <div class="lc-divider" style="background:${pal.main}"></div>
-      <div class="lc-content">
-        <div class="lc-sub">${escapeHtml(card.subtext)}</div>
-      </div>
-      <div class="lc-footer" style="background:${pal.main}">${footer}</div>`;
-  } else if (layout === 'e') {
-    inner = `
-      <div class="lc-accent-bar" style="background:${pal.main}"></div>
-      <div class="lc-logo">${logoSVG}<div style="font-size:3%;font-weight:700;color:#2C2C2C">MasteringIt</div></div>
-      <div class="lc-content">
-        <div class="lc-eyebrow" style="color:${pal.main}">${escapeHtml(card.eyebrow)}</div>
-        <div class="lc-headline">${escapeHtml(card.headline)}</div>
-        <div class="lc-sub">${escapeHtml(card.subtext)}</div>
-      </div>
-      <div class="lc-footer">
-        <span style="font-size:2%;color:#aaa">masteringit.co.za</span>
-        <div class="lc-badge" style="background:${pal.main}">${escapeHtml(card.badge)}</div>
-      </div>`;
-  } else if (layout === 'f') {
-    inner = `
-      <div class="lc-top">
-        <div class="lc-logo-text">MasteringIt</div>
-        <div class="lc-badge">${escapeHtml(card.badge)}</div>
-      </div>
-      <div class="lc-middle">
-        <div class="lc-headline">${escapeHtml(card.headline)}</div>
-        <div class="lc-sub">${escapeHtml(card.subtext)}</div>
-      </div>
-      <div class="lc-bottom">
-        <div class="lc-contact">072 372 4353<br>masteringit.co.za</div>
-        <div class="lc-dot"></div>
-      </div>`;
-  } else if (layout === 'g') {
-    inner = `
-      <div class="lc-colour-band" style="background:${pal.main}"></div>
-      <div class="lc-logo">${logoSVG}${logoText}</div>
-      <div class="lc-avatar">✦</div>
-      <div class="lc-content">
-        <div class="lc-name">Maryke Jooste</div>
-        <div class="lc-role">Founder & Owner · Mastering It</div>
-        <div class="lc-sub">${escapeHtml(card.subtext)}</div>
-      </div>
-      <div class="lc-footer">${footer}</div>`;
-  } else if (layout === 'h') {
-    const pts = (card.points && card.points.length === 3) ? card.points : ['Point one', 'Point two', 'Point three'];
-    const pointsHTML = pts.map((p, i) =>
-      `<div class="lc-point">
-        <div class="lc-point-num" style="background:${pal.main}">${i+1}</div>
-        <div class="lc-point-text">${escapeHtml(p)}</div>
-      </div>`).join('');
-    inner = `
-      <div class="lc-top">
-        <div class="lc-logo-text" style="font-family:'DM Sans';font-weight:700;color:#2C2C2C">MasteringIt</div>
-        <div class="lc-badge" style="background:${pal.main}">${escapeHtml(card.badge)}</div>
-      </div>
-      <div class="lc-headline" style="color:#2C2C2C">${escapeHtml(card.headline)}</div>
-      <div class="lc-points">${pointsHTML}</div>
-      <div class="lc-footer" style="background:${pal.main}">${footer}</div>`;
-  }
-
-  const bgStyle = ['c','e'].includes(layout) ? '' :
-    (layout === 'b' ? 'background:white' :
-    (['f'].includes(layout) ? `background:${pal.main}` : `background:#2C2C2C`));
-
-  return `<div class="visual-card layout-${layout}" id="${id}" style="${bgStyle}" title="Click to expand">${inner}</div>`;
-}
-
-// ── Actions ───────────────────────────────────────────────────────────────────
-async function copyCaption(btn, caption) {
-  try {
-    await navigator.clipboard.writeText(caption);
-    btn.textContent = '✓ Copied!';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = '📋 Copy caption'; btn.classList.remove('copied'); }, 2000);
-  } catch {
-    btn.textContent = 'Copy failed';
-  }
-}
-
-async function downloadCard(cardId, caption) {
-  const el = document.getElementById(cardId);
-  if (!el) return;
-
-  try {
-    const canvas = await html2canvas(el, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: null
-    });
-    const link = document.createElement('a');
-    link.download = `mastering-it-post-${Date.now()}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-
-    // Show Canva modal
-    document.getElementById('canva-modal').classList.add('open');
-  } catch (e) {
-    alert('Download failed. Try right-clicking the card and saving as image.');
-  }
-}
-
-function closeModal() {
-  document.getElementById('canva-modal').classList.remove('open');
-}
-
-// ── Utils ─────────────────────────────────────────────────────────────────────
-function escapeHtml(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    const data = await res.json();
+    return data.candidates[0].content.parts[0].text;
 }
 </script>
 </body>
