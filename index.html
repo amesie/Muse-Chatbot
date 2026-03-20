@@ -485,7 +485,7 @@ function md(text){
 }
 
 function renderResponse(text){
-  const m=text.match(/<POST_CARDS>([\s\S]*?)<\/POST_CARDS>/);
+  const m=text.match(/<POST_CARDS>([\s\S]*?)<\/POST_CAR[DS]S?>/);
   if(m){
     try{
       const cards=JSON.parse(m[1].trim());
