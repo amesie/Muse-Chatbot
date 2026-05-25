@@ -62,15 +62,7 @@ MUSE was built to eliminate the blank page entirely.
 
 ---
 
-## What's next
 
-- [ ] Saved favourites — like button to store useful outputs
-- [ ] Tone toggle — switch between first and third person
-- [ ] Bilingual mode — English and Afrikaans support for MasteringIt's client base
-- [ ] Response save feature — export or bookmark specific outputs
-- [ ] Upgrade path to a paid Gemini tier to remove the daily request limit
-
----
 
 ## Project context
 
